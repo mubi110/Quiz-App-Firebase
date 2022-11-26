@@ -19,20 +19,20 @@ const analytics = getAnalytics(app);
 const database = getDatabase();
 const dbRef = ref(getDatabase());
 
-var quizQuestion =
-  [
-    {
-      question: "Html Stands For __________________",
-      options: [
-        "Hyper Text Makeup Language",
-        "html",
-        "Case Cading Style Sheet",
-        "Hypertext markup language",
-      ],
-      correctAns: "Hypertext markup language",
-    },
+// var quizQuestion =
+//   [
+//     {
+//       question: "Html Stands For __________________",
+//       options: [
+//         "Hyper Text Makeup Language",
+//         "html",
+//         "Case Cading Style Sheet",
+//         "Hypertext markup language",
+//       ],
+//       correctAns: "Hypertext markup language",
+//     },
 
-  ]
+//   ]
 
 var questionCurrentIndex = document.getElementById("questionCurrentIndex");
 var questionTotalIndex = document.getElementById("questionTotalIndex");
@@ -44,35 +44,45 @@ var result = document.getElementById('result');
 var totalMarks = 5;
 
 var currentIndex = 0
+var datakey  ;
+var datavalue;
 
 function questionRender() {
   get(child(dbRef, `question/`)).then((snapshot) => {
+    // console.log(snapshot.val());
+    datakey    = Object.keys(snapshot.val())
+    datavalue = Object.values(snapshot.val())
+
+    console.log(datakey.length)
+    console.log(datavalue)
+
     if (snapshot.exists()) {
-      console.log(snapshot.val());
+      // console.log(snapshot.val());
+      questionTotalIndex.innerHTML = datakey.length;
+      questionCurrentIndex.innerHTML = currentIndex + 1;
+      question.innerHTML = datavalue[currentIndex].question
+    
+      for (var i = 0; i < datavalue[currentIndex].options.length; i++) {
+        var data = datavalue[currentIndex].options[i];
+        // console.log(data)
+        chk_btns.innerHTML += `<div class="col-md-6"><button class="text-dark fw-bold fs-5" onclick="checkAnswer('${data}','${datavalue[currentIndex].correctAns}')">${data}</button></div>
+        `
+      }
+    
     } else {
       console.log("No data available");
     }
   }).catch((error) => {
     console.error(error);
   });
-  questionTotalIndex.innerHTML = quizQuestion.length;
-  questionCurrentIndex.innerHTML = currentIndex + 1;
-  question.innerHTML = quizQuestion[currentIndex].question
-
-  for (var i = 0; i < quizQuestion[currentIndex].options.length; i++) {
-    var data = quizQuestion[currentIndex].options[i];
-
-    chk_btns.innerHTML += `<div class="col-md-6"><button class="text-dark fw-bold fs-5" onclick="checkAnswer('${data}','${quizQuestion[currentIndex].correctAns}')">${data}</button></div>
-    `
-  }
 }
 questionRender()
-function nextQuestion() {
+window.nextQuestion = function() {
   chk_btns.innerHTML = ''
   currentIndex++;
   questionRender()
 }
-window.checkAnswer = function (a, b) {
+  window.checkAnswer = function (a, b) {
   if (a == b) {
     // totalMarks + 1;
     totalMarks = totalMarks + 5;
@@ -85,7 +95,7 @@ window.checkAnswer = function (a, b) {
   }
   if (questionCurrentIndex.textContent == questionTotalIndex.textContent) {
     var modal = document.getElementById('modal');
-    var total_marks = quizQuestion.length * 5;
+    var total_marks = datavalue.length * 5;
     var res_percentage = (totalMarks / total_marks) * 100;
     modal.style.display = "inline-flex";
     total_No.innerHTML = totalMarks + ' out of ' + total_marks;
