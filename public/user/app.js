@@ -101,5 +101,5 @@ window.checkAnswer = function (a, b) {
 
 }
 window.logout = function () {
-  window.location.replace("signin.html");
+  window.location.replace("../index.html");
 }
